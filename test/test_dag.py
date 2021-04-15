@@ -1,11 +1,13 @@
 from airflow.models import DAG
 from airflow.operators.email_operator import EmailOperator
 
+from datetime import datetime
+
 default_arguments = {
     'owner': 'emilegill743',
     'email': 'emilegill743@hotmail.com',
     'start_date': datetime(2021, 4, 14),
-    'schedule_interval': @daily,
+    'schedule_interval': '@daily',
     'retries': 3
 }
 
