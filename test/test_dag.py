@@ -3,7 +3,7 @@ from airflow.operators.email_operator import EmailOperator
 
 from datetime import datetime
 
-default_arguments = {
+default_args = {
     'owner': 'emilegill743',
     'email': 'emilegill743@hotmail.com',
     'start_date': datetime(2021, 4, 14),
