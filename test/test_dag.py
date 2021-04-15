@@ -13,6 +13,7 @@ default_arguments = {
 
 test_email_dag = DAG(
     dag_id='test_email_dag',
+    default_args=default_args
 )
 
 email_task = EmailOperator(
