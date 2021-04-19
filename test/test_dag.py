@@ -8,7 +8,8 @@ default_args = {
     'email': 'emilegill743@hotmail.com',
     'start_date': datetime(2021, 4, 14),
     'schedule_interval': '@daily',
-    'retries': 3
+    'retries': 3,
+    'pool': 'default_pool'
 }
 
 test_email_dag = DAG(
