@@ -5,7 +5,7 @@ from datetime import datetime
 
 default_args = {
     'owner': 'emilegill743',
-    'email': 'emilegill743@hotmail.com',
+    'email': 'emile.data@gmail.com',
     'start_date': datetime(2021, 4, 14),
     'schedule_interval': '@daily',
     'retries': 3,
