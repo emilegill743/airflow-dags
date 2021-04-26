@@ -20,6 +20,7 @@ default_args = {
 }
 
 postgres_hook = PostgresHook("postgres_rds_connection", schema="covid-19")
+print(postgres_hook.get_uri())
 postgres_engine = postgres_hook.get_sqlalchemy_engine()
 
 etl_dag = DAG(

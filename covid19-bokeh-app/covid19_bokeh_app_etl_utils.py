@@ -17,15 +17,11 @@ def etl_decorator(func):
     """Wrap func in try-except and report time taken to execute"""
     @functools.wraps(func)
     def wrapper(*args, **kwargs):
-        try:
-            start = time.perf_counter()
-            value = func(*args, **kwargs)
-            end = time.perf_counter()
-            print(f"Successfully executed {func.__name__} in {end-start:0.4f}s")
-            return value
-        except Exception as err:
-            print(f"Failed to execute {func.__name__}")
-            print(sys.exc_info())
+        start = time.perf_counter()
+        value = func(*args, **kwargs)
+        end = time.perf_counter()
+        print(f"Successfully executed {func.__name__} in {end-start:0.4f}s")
+        return value
     return wrapper
 
 
