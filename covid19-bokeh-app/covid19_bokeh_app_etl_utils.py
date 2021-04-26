@@ -26,7 +26,7 @@ def etl_decorator(func):
 
 
 @etl_decorator
-def jhu_cases_etl(db_engine):
+def jhu_cases_etl(connection_uri):
 
     """ETL job for Johns Hopkins Global Cases Data"""
 
@@ -70,9 +70,11 @@ def jhu_cases_etl(db_engine):
 
         return(jhu_df)
 
-    def load_data(jhu_df, db_engine):
+    def load_data(jhu_df, connection_uri):
 
         """Load JHU data into Postgres Database"""
+
+        db_engine = create_engine(connection_uri)
 
         jhu_df.to_sql(
             name="jhu_global_cases",
@@ -83,11 +85,11 @@ def jhu_cases_etl(db_engine):
 
     data = extract_data()
     data = transform_data(data)
-    load_data(data, db_engine)
+    load_data(data, connection_uri)
 
 
 @etl_decorator
-def jhu_deaths_etl(db_engine):
+def jhu_deaths_etl(connection_uri):
 
     """ETL job for Johns Hopkins Global Deaths Data"""
 
@@ -131,9 +133,11 @@ def jhu_deaths_etl(db_engine):
 
         return(jhu_df)
 
-    def load_data(jhu_df, db_engine):
+    def load_data(jhu_df, connection_uri):
 
         """Load JHU data into Postgres Database"""
+
+        db_engine = create_engine(connection_uri)
 
         jhu_df.to_sql(
                 name="jhu_global_deaths",
@@ -144,11 +148,11 @@ def jhu_deaths_etl(db_engine):
 
     data = extract_data()
     data = transform_data(data)
-    load_data(data, db_engine)
+    load_data(data, connection_uri)
 
 
 @etl_decorator
-def jhu_lookup_etl(db_engine):
+def jhu_lookup_etl(connection_uri):
 
     """ETL job for Johns Hopkins Reference 'Lookup' Table"""
 
@@ -173,6 +177,8 @@ def jhu_lookup_etl(db_engine):
         columns={col: col.lower() for col in lookup_df.columns},
         inplace=True)
 
+    db_engine = create_engine(connection_uri)
+
     lookup_df.to_sql(
         name="jhu_lookup",
         con=db_engine,
@@ -182,7 +188,7 @@ def jhu_lookup_etl(db_engine):
 
 
 @etl_decorator
-def jhu_us_cases_etl(db_engine):
+def jhu_us_cases_etl(connection_uri):
 
     """ETL job for Johns Hopkins US Deaths Data"""
 
@@ -226,11 +232,10 @@ def jhu_us_cases_etl(db_engine):
 
         return(jhu_df)
 
-    def load_data(jhu_df, db_engine):
+    def load_data(jhu_df, connection_uri):
 
         """Load JHU data into Postgres Database"""
 
-        connection_uri = os.environ['connection_uri']
         db_engine = create_engine(connection_uri)
 
         jhu_df.to_sql(
@@ -242,11 +247,11 @@ def jhu_us_cases_etl(db_engine):
 
     data = extract_data()
     data = transform_data(data)
-    load_data(data, db_engine)
+    load_data(data, connection_uri)
 
 
 @etl_decorator
-def jhu_us_deaths_etl(db_engine):
+def jhu_us_deaths_etl(connection_uri):
 
     """ETL job for Johns Hopkins US Deaths Data"""
 
@@ -291,11 +296,10 @@ def jhu_us_deaths_etl(db_engine):
 
         return(jhu_df)
 
-    def load_data(jhu_df, db_engine):
+    def load_data(jhu_df, connection_uri):
 
         """Load JHU data into Postgres Database"""
 
-        connection_uri = os.environ['connection_uri']
         db_engine = create_engine(connection_uri)
 
         jhu_df.to_sql(
@@ -307,11 +311,11 @@ def jhu_us_deaths_etl(db_engine):
 
     data = extract_data()
     data = transform_data(data)
-    load_data(data, db_engine)
+    load_data(data, connection_uri)
 
 
 @etl_decorator
-def us_states_etl(db_engine):
+def us_states_etl(connection_uri):
 
     """ETL job for loading US states
     Longitude/Latitude data"""
@@ -323,6 +327,8 @@ def us_states_etl(db_engine):
 
     us_states_df = pd.read_csv(us_states_dataset_path)
 
+    db_engine = create_engine(connection_uri)
+
     us_states_df.to_sql(
                 name="us_states_coords",
                 con=db_engine,
@@ -332,7 +338,7 @@ def us_states_etl(db_engine):
 
 
 @etl_decorator
-def local_uk_data_etl(db_engine):
+def local_uk_data_etl(connection_uri):
 
     """ETL job for UK local data"""
 
@@ -370,9 +376,11 @@ def local_uk_data_etl(db_engine):
 
         return(local_uk_df)
 
-    def load_data(local_uk_df, db_engine):
+    def load_data(local_uk_df, connection_uri):
 
         """Load UK local data into Postgres Database"""
+
+        db_engine = create_engine(connection_uri)
 
         local_uk_df.to_sql(
             name="local_uk",
@@ -383,11 +391,11 @@ def local_uk_data_etl(db_engine):
 
     data = extract_data()
     data = transform_data(data)
-    load_data(data, db_engine)
+    load_data(data, connection_uri)
 
 
 @etl_decorator
-def owid_global_vaccinations_etl(db_engine):
+def owid_global_vaccinations_etl(connection_uri):
 
     # Extract owid vaccinations data
     owid_global_vaccinations_url = "https://raw.githubusercontent.com/owid/covid-19-data/master/public/data/vaccinations/vaccinations.csv"
@@ -397,6 +405,9 @@ def owid_global_vaccinations_etl(db_engine):
                                             owid_global_vaccinations_df.date)
 
     # Load owid vaccinations data
+
+    db_engine = create_engine(connection_uri)
+
     owid_global_vaccinations_df.to_sql(
         name="owid_global_vaccinations",
         con=db_engine,
@@ -406,7 +417,7 @@ def owid_global_vaccinations_etl(db_engine):
 
 
 @etl_decorator
-def bloomberg_global_vaccinations_etl(db_engine):
+def bloomberg_global_vaccinations_etl(connection_uri):
 
     # Extract owid vaccinations data
     bloomberg_global_vaccinations_url = "https://raw.githubusercontent.com/BloombergGraphics/covid-vaccine-tracker-data/master/data/current-global.csv"
@@ -414,6 +425,9 @@ def bloomberg_global_vaccinations_etl(db_engine):
                                             bloomberg_global_vaccinations_url)
 
     # Load owid vaccinations data
+
+    db_engine = create_engine(connection_uri)
+    
     bloomberg_global_vaccinations_df.to_sql(
         name="bloomberg_global_vaccinations",
         con=db_engine,
@@ -423,7 +437,7 @@ def bloomberg_global_vaccinations_etl(db_engine):
 
 
 @etl_decorator
-def create_data_files(db_engine):
+def create_data_files(connection_uri):
 
     dirname = os.path.dirname(__file__)
 
@@ -449,18 +463,18 @@ def create_data_files(db_engine):
                 )
 
 
-def etl(db_engine):
+def etl(connection_uri):
 
-    jhu_cases_etl(db_engine)
-    jhu_deaths_etl(db_engine)
-    jhu_lookup_etl(db_engine)
-    jhu_us_cases_etl(db_engine)
-    jhu_us_deaths_etl(db_engine)
-    us_states_etl(db_engine)
-    local_uk_data_etl(db_engine)
-    owid_global_vaccinations_etl(db_engine)
-    bloomberg_global_vaccinations_etl(db_engine)
-    create_data_files(db_engine)
+    jhu_cases_etl(connection_uri)
+    jhu_deaths_etl(connection_uri)
+    jhu_lookup_etl(connection_uri)
+    jhu_us_cases_etl(connection_uri)
+    jhu_us_deaths_etl(connection_uri)
+    us_states_etl(connection_uri)
+    local_uk_data_etl(connection_uri)
+    owid_global_vaccinations_etl(connection_uri)
+    bloomberg_global_vaccinations_etl(connection_uri)
+    create_data_files(connection_uri)
 
 
 if __name__ == '__main__':
@@ -468,9 +482,8 @@ if __name__ == '__main__':
     start = time.perf_counter()
 
     connection_uri = os.environ['connection_uri']
-    db_engine = create_engine(connection_uri)
 
-    etl(db_engine)
+    etl(connection_uri)
 
     end = time.perf_counter()
 

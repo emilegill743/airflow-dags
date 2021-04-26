@@ -20,7 +20,7 @@ default_args = {
 }
 
 postgres_hook = PostgresHook("postgres_rds_conn_covid_19")
-postgres_engine = postgres_hook.get_sqlalchemy_engine()
+postgres_engine = postgres_hook.get_uri()
 
 etl_dag = DAG(
     dag_id='covid_19_bokeh_app_etl',
