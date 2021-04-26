@@ -4,6 +4,10 @@ from airflow.hooks.postgres_hook import PostgresHook
 
 from datetime import datetime
 import pandas as pd
+import sys
+import os
+
+sys.path.insert(os.path.dirname(__file__))
 from covid19_bokeh_app_etl_utils import jhu_cases_etl
 
 
