@@ -1,6 +1,6 @@
 from airflow.models import DAG
 from airflow.operators.python_operator import PythonOperator
-from airflow.hooks.postgres_hook import PostgresHook
+from airflow.providers.postgres.hooks.postgres import PostgresHook
 
 from datetime import datetime
 import pandas as pd
@@ -19,8 +19,7 @@ default_args = {
     'retries': 3
 }
 
-postgres_hook = PostgresHook("postgres_rds_connection", schema="covid-19")
-print(postgres_hook.get_uri())
+postgres_hook = PostgresHook("postgres_rds_conn_covid_19")
 postgres_engine = postgres_hook.get_sqlalchemy_engine()
 
 etl_dag = DAG(
