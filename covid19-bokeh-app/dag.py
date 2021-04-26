@@ -7,7 +7,7 @@ import pandas as pd
 import sys
 import os
 
-sys.path.insert(os.path.dirname(__file__))
+sys.path.insert(0, os.path.dirname(__file__))
 from covid19_bokeh_app_etl_utils import jhu_cases_etl
 
 
