@@ -79,6 +79,7 @@ def jhu_cases_etl(connection_uri):
         jhu_df.to_sql(
             name="jhu_global_cases",
             con=db_engine,
+            schema="raw",
             if_exists="replace",
             index=False,
             method='multi')
@@ -142,6 +143,7 @@ def jhu_deaths_etl(connection_uri):
         jhu_df.to_sql(
                 name="jhu_global_deaths",
                 con=db_engine,
+                schema="raw",
                 if_exists="replace",
                 index=False,
                 method='multi')
@@ -182,6 +184,7 @@ def jhu_lookup_etl(connection_uri):
     lookup_df.to_sql(
         name="jhu_lookup",
         con=db_engine,
+        schema="raw",
         if_exists="replace",
         index=False,
         method='multi')
@@ -241,6 +244,7 @@ def jhu_us_cases_etl(connection_uri):
         jhu_df.to_sql(
             name="jhu_us_cases",
             con=db_engine,
+            schema="raw",
             if_exists="replace",
             index=False,
             method='multi')
@@ -305,6 +309,7 @@ def jhu_us_deaths_etl(connection_uri):
         jhu_df.to_sql(
             name="jhu_us_deaths",
             con=db_engine,
+            schema="raw",
             if_exists="replace",
             index=False,
             method='multi')
@@ -332,6 +337,7 @@ def us_states_etl(connection_uri):
     us_states_df.to_sql(
                 name="us_states_coords",
                 con=db_engine,
+                schema="raw",
                 if_exists="replace",
                 index=False,
                 method='multi')
@@ -385,6 +391,7 @@ def local_uk_data_etl(connection_uri):
         local_uk_df.to_sql(
             name="local_uk",
             con=db_engine,
+            schema="raw",
             if_exists="replace",
             index=False,
             method='multi')
@@ -411,6 +418,7 @@ def owid_global_vaccinations_etl(connection_uri):
     owid_global_vaccinations_df.to_sql(
         name="owid_global_vaccinations",
         con=db_engine,
+        schema="raw",
         if_exists="replace",
         index=False,
         method='multi')
@@ -427,10 +435,11 @@ def bloomberg_global_vaccinations_etl(connection_uri):
     # Load owid vaccinations data
 
     db_engine = create_engine(connection_uri)
-    
+
     bloomberg_global_vaccinations_df.to_sql(
         name="bloomberg_global_vaccinations",
         con=db_engine,
+        schema="raw",
         if_exists="replace",
         index=False,
         method='multi')
@@ -463,7 +472,7 @@ def create_data_files(connection_uri):
                 )
 
 
-def etl(connection_uri):
+def run_etl(connection_uri):
 
     jhu_cases_etl(connection_uri)
     jhu_deaths_etl(connection_uri)
@@ -483,7 +492,7 @@ if __name__ == '__main__':
 
     connection_uri = os.environ['connection_uri']
 
-    etl(connection_uri)
+    run_etl(connection_uri)
 
     end = time.perf_counter()
 

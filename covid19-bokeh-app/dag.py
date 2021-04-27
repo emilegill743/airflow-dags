@@ -29,7 +29,8 @@ connection_uri = postgres_hook.get_uri()
 
 etl_dag = DAG(
     dag_id='covid_19_bokeh_app_etl',
-    default_args=default_args
+    default_args=default_args,
+    schedule_interval="* */2 * * *"
 )
 
 extract_jhu_cases_task = PythonOperator(
