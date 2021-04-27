@@ -21,7 +21,8 @@ default_args = {
     'email_on_failure': True,
     'start_date': datetime(2021, 4, 23),
     'retries': 3,
-    'catchup': False
+    'catchup': False,
+    'max_active_runs': 1
 }
 
 postgres_hook = PostgresHook("postgres_rds_conn_covid_19")
@@ -30,7 +31,7 @@ connection_uri = postgres_hook.get_uri()
 etl_dag = DAG(
     dag_id='covid_19_bokeh_app_etl',
     default_args=default_args,
-    schedule_interval="0 */2 * * *"
+    schedule_interval="0 */3 * * *"
 )
 
 extract_jhu_cases_task = PythonOperator(
