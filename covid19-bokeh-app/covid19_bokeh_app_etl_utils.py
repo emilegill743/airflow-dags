@@ -352,23 +352,30 @@ def local_uk_data_etl(connection_uri):
 
         """Pull local UK data from gov.uk API"""
 
-        all_nations = [
+        endpoint = "https://api.coronavirus.data.gov.uk/v1/data"
+
+        filters = [
             "areaType=ltla"
         ]
 
-        cases_and_deaths = {
+        structure = {
             "date": "date",
             "areaName": "areaName",
             "areaCode": "areaCode",
             "newCasesByPublishDate": "newCasesByPublishDate",
             "cumCasesByPublishDate": "cumCasesByPublishDate"}
 
-        api = Cov19API(
-            filters=all_nations,
-            structure=cases_and_deaths
-        )
+        api_params = {
+            "filters": str.join(";", filters),
+            "structure": json.dumps(structure, separators=(",", ":"))}
 
-        df = api.get_dataframe()
+        response = requests.get(endpoint, params=api_params, timeout=240)
+
+        if response.status_code >= 400:
+            raise RuntimeError(f'Request failed: { response.text }')
+
+        json_data = response.json()
+        df = pd.DataFrame(json_data["data"])
 
         return(df)
 
