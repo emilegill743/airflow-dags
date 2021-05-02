@@ -2,6 +2,12 @@ from airflow.models import DAG
 from airflow.operators.python_operator import PythonOperator
 from airflow.providers.postgres.hooks.postgres import PostgresHook
 
+from airflow_dbt.operators.dbt_operator import (
+    DbtSeedOperator,
+    DbtSnapshotOperator,
+    DbtRunOperator,
+    DbtTestOperator)
+
 from datetime import datetime
 import pandas as pd
 import sys
@@ -22,62 +28,41 @@ default_args = {
     'start_date': datetime(2021, 4, 23),
     'retries': 3,
     'catchup': False,
-    'max_active_runs': 1
+    'max_active_runs': 1,
+    'dir': '/home/emilegill743/Projects/dbt_models'
 }
 
 postgres_hook = PostgresHook("postgres_rds_conn_covid_19")
 connection_uri = postgres_hook.get_uri()
 
-etl_dag = DAG(
-    dag_id='covid_19_bokeh_app_etl',
-    default_args=default_args,
-    schedule_interval="0 */3 * * *"
-)
+with DAG(dag_id='covid_19_bokeh_app_etl',
+         default_args=default_args,
+         schedule_interval="0 */3 * * *") as dag:
 
-extract_jhu_cases_task = PythonOperator(
-                                task_id='extract_jhu_cases_task',
-                                python_callable=jhu_cases_etl,
-                                op_kwargs={"connection_uri": connection_uri},
-                                dag=etl_dag)
+    dbt_seed = DbtSeedOperator(task_id='dbt_seed')
 
-extract_jhu_deaths_task = PythonOperator(
-                                task_id='extract_jhu_deaths_task',
-                                python_callable=jhu_deaths_etl,
-                                op_kwargs={"connection_uri": connection_uri},
-                                dag=etl_dag)
+    dbt_run = DbtRunOperator(task_id='dbt_run')
 
-extract_jhu_lookup_task = PythonOperator(
-                                task_id='extract_jhu_lookup_task',
-                                python_callable=jhu_lookup_etl,
-                                op_kwargs={"connection_uri": connection_uri},
-                                dag=etl_dag)
+    dbt_test = DbtTestOperator(task_id='dbt_test', retries=0)
 
-extract_jhu_us_cases_task = PythonOperator(
-                                task_id='extract_jhu_us_cases_task',
-                                python_callable=jhu_us_cases_etl,
-                                op_kwargs={"connection_uri": connection_uri},
-                                dag=etl_dag)
+    dbt_seed >> dbt_run >> dbt_test
 
-extract_jhu_us_deaths_task = PythonOperator(
-                                task_id='extract_jhu_us_deaths_task',
-                                python_callable=jhu_us_deaths_etl,
-                                op_kwargs={"connection_uri": connection_uri},
-                                dag=etl_dag)
+    extract_jobs = {
+        'jhu_cases': jhu_cases_etl,
+        'jhu_deaths': jhu_deaths_etl,
+        'jhu_lookup': jhu_lookup_etl,
+        'jhu_us_cases': jhu_us_cases_etl,
+        'jhu_us_deaths': jhu_us_deaths_etl,
+        'local_uk_data': local_uk_data_etl,
+        'owid_global_vaccinations': owid_global_vaccinations_etl,
+        'bloomberg_global_vaccinations': bloomberg_global_vaccinations_etl
+        }
 
-extract_local_uk_data_task = PythonOperator(
-                                task_id='extract_local_uk_data_task',
-                                python_callable=local_uk_data_etl,
-                                op_kwargs={"connection_uri": connection_uri},
-                                dag=etl_dag)
+    for job_name in extract_jobs.keys():
 
-extract_owid_global_vaccinations_task = PythonOperator(
-                                task_id='extract_owid_global_vaccinations_task',
-                                python_callable=owid_global_vaccinations_etl,
-                                op_kwargs={"connection_uri": connection_uri},
-                                dag=etl_dag)
-
-extract_bloomberg_global_vaccinations_task = PythonOperator(
-                                task_id='extract_bloomberg_global_vaccinations_task',
-                                python_callable=bloomberg_global_vaccinations_etl,
-                                op_kwargs={"connection_uri": connection_uri},
-                                dag=etl_dag)
+        task = PythonOperator(
+                    task_id=f'extract_{job_name}',
+                    python_callable=extract_jobs[job_name],
+                    op_kwargs={"connection_uri": connection_uri})
+        
+        task << dbt_seed
