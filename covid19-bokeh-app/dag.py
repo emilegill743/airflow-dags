@@ -65,4 +65,4 @@ with DAG(dag_id='covid_19_bokeh_app_etl',
                     python_callable=extract_jobs[job_name],
                     op_kwargs={"connection_uri": connection_uri})
         
-        task << dbt_seed
+        task >> dbt_seed
