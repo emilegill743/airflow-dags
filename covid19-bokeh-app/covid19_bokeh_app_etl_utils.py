@@ -12,20 +12,6 @@ from pycountry_convert import (
     country_alpha2_to_continent_code,
     country_name_to_country_alpha2)
 
-
-def etl_decorator(func):
-    """Wrap func in try-except and report time taken to execute"""
-    @functools.wraps(func)
-    def wrapper(*args, **kwargs):
-        start = time.perf_counter()
-        value = func(*args, **kwargs)
-        end = time.perf_counter()
-        print(f"Successfully executed {func.__name__} in {end-start:0.4f}s")
-        return value
-    return wrapper
-
-
-@etl_decorator
 def jhu_cases_etl(connection_uri):
 
     """ETL job for Johns Hopkins Global Cases Data"""
@@ -89,7 +75,6 @@ def jhu_cases_etl(connection_uri):
     load_data(data, connection_uri)
 
 
-@etl_decorator
 def jhu_deaths_etl(connection_uri):
 
     """ETL job for Johns Hopkins Global Deaths Data"""
@@ -153,7 +138,6 @@ def jhu_deaths_etl(connection_uri):
     load_data(data, connection_uri)
 
 
-@etl_decorator
 def jhu_lookup_etl(connection_uri):
 
     """ETL job for Johns Hopkins Reference 'Lookup' Table"""
@@ -190,7 +174,6 @@ def jhu_lookup_etl(connection_uri):
         method='multi')
 
 
-@etl_decorator
 def jhu_us_cases_etl(connection_uri):
 
     """ETL job for Johns Hopkins US Deaths Data"""
@@ -254,7 +237,6 @@ def jhu_us_cases_etl(connection_uri):
     load_data(data, connection_uri)
 
 
-@etl_decorator
 def jhu_us_deaths_etl(connection_uri):
 
     """ETL job for Johns Hopkins US Deaths Data"""
@@ -319,7 +301,6 @@ def jhu_us_deaths_etl(connection_uri):
     load_data(data, connection_uri)
 
 
-@etl_decorator
 def us_states_etl(connection_uri):
 
     """ETL job for loading US states
@@ -343,7 +324,6 @@ def us_states_etl(connection_uri):
                 method='multi')
 
 
-@etl_decorator
 def local_uk_data_etl(connection_uri):
 
     """ETL job for UK local data"""
@@ -408,7 +388,6 @@ def local_uk_data_etl(connection_uri):
     load_data(data, connection_uri)
 
 
-@etl_decorator
 def owid_global_vaccinations_etl(connection_uri):
 
     # Extract owid vaccinations data
@@ -431,7 +410,6 @@ def owid_global_vaccinations_etl(connection_uri):
         method='multi')
 
 
-@etl_decorator
 def bloomberg_global_vaccinations_etl(connection_uri):
 
     # Extract owid vaccinations data
@@ -451,56 +429,15 @@ def bloomberg_global_vaccinations_etl(connection_uri):
         index=False,
         method='multi')
 
+def load_to_s3(data_view, connection_uri):
 
-@etl_decorator
-def create_data_files(connection_uri):
+    db_engine = create_engine(connection_uri)
 
-    dirname = os.path.dirname(__file__)
-
-    data_views = [
-        'country_trajectories',
-        'geo_time_evolution',
-        'global_by_day',
-        'continents_by_day',
-        'local_uk',
-        'vaccinations_by_country_by_day',
-        'vaccinations_by_continent_by_day'
-        ]
-
-    for view in data_views:
-
-        sql_file = os.path.join(dirname, 'sql', f'{view}.sql')
-        sql = open(sql_file, 'r').read()
-
-        data = pd.read_sql(sql, db_engine)
-        data.to_csv(
-                os.path.join(dirname, 'data_view', f'{view}.csv'),
-                index=False
-                )
-
-
-def run_etl(connection_uri):
-
-    jhu_cases_etl(connection_uri)
-    jhu_deaths_etl(connection_uri)
-    jhu_lookup_etl(connection_uri)
-    jhu_us_cases_etl(connection_uri)
-    jhu_us_deaths_etl(connection_uri)
-    us_states_etl(connection_uri)
-    local_uk_data_etl(connection_uri)
-    owid_global_vaccinations_etl(connection_uri)
-    bloomberg_global_vaccinations_etl(connection_uri)
-    create_data_files(connection_uri)
-
-
-if __name__ == '__main__':
-
-    start = time.perf_counter()
-
-    connection_uri = os.environ['connection_uri']
-
-    run_etl(connection_uri)
-
-    end = time.perf_counter()
-
-    print(f"\nLoaded data in {end-start:0.4f}s")
+    data = pd.read_sql(data_view, db_engine)
+    data.to_csv(
+        f's3://covid19-bokeh-app/data/{data_view}',
+        index=False,
+        storage_options={
+            "key": os.environ('AWS_ACCESS_KEY_ID'),
+            "secret": os.environ('AWS_SECRET_ACCESS_KEY')}
+    )

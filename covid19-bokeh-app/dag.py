@@ -18,7 +18,8 @@ from covid19_bokeh_app_etl_utils import (
     jhu_cases_etl, jhu_deaths_etl, jhu_lookup_etl,
     jhu_us_cases_etl, jhu_us_deaths_etl,
     local_uk_data_etl, owid_global_vaccinations_etl,
-    bloomberg_global_vaccinations_etl)
+    bloomberg_global_vaccinations_etl,
+    load_to_s3)
 
 
 default_args = {
@@ -70,9 +71,29 @@ with DAG(dag_id='covid_19_bokeh_app_etl',
 
     for job_name in extract_jobs.keys():
 
-        task = PythonOperator(
-                    task_id=f'extract_{job_name}',
-                    python_callable=extract_jobs[job_name],
-                    op_kwargs={"connection_uri": connection_uri})
+        extract_task = PythonOperator(
+                task_id=f'extract_{job_name}',
+                python_callable=extract_jobs[job_name],
+                op_kwargs={"connection_uri": connection_uri})
         
-        task >> dbt_seed
+        extract_task >> dbt_seed
+
+    data_views = [
+        'country_trajectories',
+        'geo_time_evolution',
+        'global_by_day',
+        'continents_by_day',
+        'local_uk',
+        'vaccinations_by_country_by_day',
+        'vaccinations_by_continent_by_day'
+        ]
+
+    for view in data_views:
+
+        load_task = PythonOperator(
+            task_id=f'load_{view}',
+            python_callable=load_to_s3,
+            op_kwargs={
+                "data_view": view,
+                "connection_uri": connection_uri},
+            provide_context=True)
