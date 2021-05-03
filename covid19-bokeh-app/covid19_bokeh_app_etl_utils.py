@@ -433,7 +433,11 @@ def load_to_s3(data_view, connection_uri):
 
     db_engine = create_engine(connection_uri)
 
-    data = pd.read_sql(data_view, db_engine)
+    data = pd.read_sql_table(
+        table_name=data_view,
+        con=db_engine,
+        schema='prod')
+
     data.to_csv(
         f's3://covid19-bokeh-app/data/{data_view}',
         index=False,
