@@ -442,6 +442,6 @@ def load_to_s3(data_view, connection_uri):
         f's3://covid19-bokeh-app/data/{data_view}',
         index=False,
         storage_options={
-            "key": os.environ('AWS_ACCESS_KEY_ID'),
-            "secret": os.environ('AWS_SECRET_ACCESS_KEY')}
+            "key": os.environ['AWS_ACCESS_KEY_ID'],
+            "secret": os.environ['AWS_SECRET_ACCESS_KEY']}
     )
