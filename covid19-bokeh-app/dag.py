@@ -40,11 +40,15 @@ with DAG(dag_id='covid_19_bokeh_app_etl',
          default_args=default_args,
          schedule_interval="0 */3 * * *") as dag:
 
-    dbt_seed = DbtSeedOperator(task_id='dbt_seed')
+    dbt_seed = DbtSeedOperator(task_id='dbt_seed',
+                               provide_context=True)
 
-    dbt_run = DbtRunOperator(task_id='dbt_run')
+    dbt_run = DbtRunOperator(task_id='dbt_run',
+                             provide_context=True)
 
-    dbt_test = DbtTestOperator(task_id='dbt_test', retries=0)
+    dbt_test = DbtTestOperator(task_id='dbt_test',
+                               provide_context=True,
+                               retries=0)
 
     dbt_seed >> dbt_run >> dbt_test
 
