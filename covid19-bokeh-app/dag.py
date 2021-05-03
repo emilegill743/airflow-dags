@@ -38,17 +38,17 @@ postgres_hook = PostgresHook("postgres_rds_conn_covid_19")
 connection_uri = postgres_hook.get_uri()
 
 s3_credentials = {
-    "key": Variable.get('AWS_ACCESS_KEY_ID'),
-    "secret": Variable.get('AWS_SECRET_ACCESS_KEY')}
+    'key': Variable.get('AWS_ACCESS_KEY_ID'),
+    'secret': Variable.get('AWS_SECRET_ACCESS_KEY')}
+
+dbt_vars = {
+    'DBT_USER': Variable.get('DBT_USER'),
+    'DBT_PASSWORD':  Variable.get('DBT_PASSWORD')
+    }
 
 with DAG(dag_id='covid_19_bokeh_app_etl',
          default_args=default_args,
          schedule_interval="0 */3 * * *") as dag:
-
-    dbt_vars = {
-        'DBT_USER': Variable.get('DBT_USER'),
-        'DBT_PASSWORD':  Variable.get('DBT_PASSWORD')
-    }
 
     dbt_seed = DbtSeedOperator(task_id='dbt_seed',
                                vars=dbt_vars)
