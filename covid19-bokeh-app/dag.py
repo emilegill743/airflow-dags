@@ -40,7 +40,6 @@ with DAG(dag_id='covid_19_bokeh_app_etl',
          default_args=default_args,
          schedule_interval="0 */3 * * *") as dag:
 
-<<<<<<< HEAD
     dbt_vars = {
         'DBT_USER': Variable.get('DBT_USER'),
         'DBT_PASSWORD':  Variable.get('DBT_PASSWORD')
@@ -54,16 +53,6 @@ with DAG(dag_id='covid_19_bokeh_app_etl',
 
     dbt_test = DbtTestOperator(task_id='dbt_test',
                                vars=dbt_vars,
-=======
-    dbt_seed = DbtSeedOperator(task_id='dbt_seed',
-                               provide_context=True)
-
-    dbt_run = DbtRunOperator(task_id='dbt_run',
-                             provide_context=True)
-
-    dbt_test = DbtTestOperator(task_id='dbt_test',
-                               provide_context=True,
->>>>>>> 7e045538574c702f0e0c6195d013f51c0886d4c9
                                retries=0)
 
     dbt_seed >> dbt_run >> dbt_test
