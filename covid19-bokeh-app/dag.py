@@ -1,4 +1,4 @@
-from airflow.models import DAG
+from airflow.models import DAG, Variable
 from airflow.operators.python_operator import PythonOperator
 from airflow.providers.postgres.hooks.postgres import PostgresHook
 
@@ -40,11 +40,20 @@ with DAG(dag_id='covid_19_bokeh_app_etl',
          default_args=default_args,
          schedule_interval="0 */3 * * *") as dag:
 
-    dbt_seed = DbtSeedOperator(task_id='dbt_seed')
+    dbt_vars = {
+        'DBT_USER': Variable.get('DBT_USER'),
+        'DBT_PASSWORD':  Variable.get('DBT_PASSWORD')
+    }
 
-    dbt_run = DbtRunOperator(task_id='dbt_run')
+    dbt_seed = DbtSeedOperator(task_id='dbt_seed',
+                               vars=dbt_vars)
 
-    dbt_test = DbtTestOperator(task_id='dbt_test', retries=0)
+    dbt_run = DbtRunOperator(task_id='dbt_run',
+                             vars=dbt_vars)
+
+    dbt_test = DbtTestOperator(task_id='dbt_test',
+                               vars=dbt_vars,
+                               retries=0)
 
     dbt_seed >> dbt_run >> dbt_test
 
