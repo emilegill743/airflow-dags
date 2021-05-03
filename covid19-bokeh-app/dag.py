@@ -97,3 +97,5 @@ with DAG(dag_id='covid_19_bokeh_app_etl',
                 "data_view": view,
                 "connection_uri": connection_uri},
             provide_context=True)
+        
+        load_task << dbt_test
