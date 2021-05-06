@@ -439,6 +439,6 @@ def load_to_s3(table_name, connection_uri, s3_credentials):
         schema='prod')
 
     data.to_csv(
-        f's3://covid19-bokeh-app/data/{table_name}',
+        f's3://covid19-bokeh-app/data/{table_name}.csv',
         index=False,
         storage_options=s3_credentials)
