@@ -7,7 +7,7 @@ import sys
 import requests
 import json
 import io
-from uk_covid19 import Cov19API
+from http import HTTPStatus
 from pycountry_convert import (
     country_alpha2_to_continent_code,
     country_name_to_country_alpha2)
@@ -349,13 +349,31 @@ def local_uk_data_etl(connection_uri):
             "filters": str.join(";", filters),
             "structure": json.dumps(structure, separators=(",", ":"))}
 
-        response = requests.get(endpoint, params=api_params, timeout=240)
+        data = []
+        page_number = 1
 
-        if response.status_code >= 400:
-            raise RuntimeError(f'Request failed: { response.text }')
+        while True:
 
-        json_data = response.json()
-        df = pd.DataFrame(json_data["data"])
+            api_params["page"] = page_number
+
+            response = requests.get(endpoint, params=api_params, timeout=240)
+
+            if response.status_code >= HTTPStatus.BAD_REQUEST:
+                raise RuntimeError(f'Request failed: {response.text}')
+            elif response.status_code == HTTPStatus.NO_CONTENT:
+                break
+
+            current_data = response.json()
+            page_data = current_data['data']
+
+            data.extend(page_data)
+
+            if current_data["pagination"]["next"] is None:
+                break
+
+            page_number += 1
+
+        df = pd.DataFrame(data)
 
         return(df)
 
