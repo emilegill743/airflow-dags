@@ -37,9 +37,10 @@ default_args = {
 postgres_hook = PostgresHook("postgres_rds_conn_covid_19")
 connection_uri = postgres_hook.get_uri()
 
-s3_credentials = {
+s3_storage_options = {
     'key': Variable.get('AWS_ACCESS_KEY_ID'),
-    'secret': Variable.get('AWS_SECRET_ACCESS_KEY')}
+    'secret': Variable.get('AWS_SECRET_ACCESS_KEY'),
+    's3_additional_kwargs': {'ACL': 'public-read'}}
 
 dbt_vars = {
     'DBT_USER': Variable.get('DBT_USER'),
@@ -100,7 +101,7 @@ with DAG(dag_id='covid_19_bokeh_app_etl',
             op_kwargs={
                 "table_name": view,
                 "connection_uri": connection_uri,
-                "s3_credentials": s3_credentials},
+                "s3_storage_options": s3_storage_options},
             provide_context=True)
         
         load_task << dbt_test
