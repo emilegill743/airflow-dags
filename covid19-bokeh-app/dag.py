@@ -31,7 +31,8 @@ default_args = {
     'catchup': False,
     'max_active_runs': 1,
     'dir': '/home/emilegill743/Projects/dbt_models/covid19_bokeh_app',
-    'profiles_dir': '/home/emilegill743/Projects/dbt_models'
+    'profiles_dir': '/home/emilegill743/Projects/dbt_models',
+    'dbt_bin': '/home/emilegill743/Projects/airflow_venv/venv/bin'
 }
 
 postgres_hook = PostgresHook("postgres_rds_conn_covid_19")
