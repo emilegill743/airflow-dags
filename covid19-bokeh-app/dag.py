@@ -50,7 +50,7 @@ dbt_vars = {
 
 with DAG(dag_id='covid_19_bokeh_app_etl',
          default_args=default_args,
-         schedule_interval="0 */3 * * *") as dag:
+         schedule_interval="0 */12 * * *") as dag:
 
     dbt_seed = DbtSeedOperator(task_id='dbt_seed',
                                vars=dbt_vars)
