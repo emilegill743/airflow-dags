@@ -40,8 +40,7 @@ connection_uri = postgres_hook.get_uri()
 
 s3_storage_options = {
     'key': Variable.get('AWS_ACCESS_KEY_ID'),
-    'secret': Variable.get('AWS_SECRET_ACCESS_KEY'),
-    's3_additional_kwargs': {'ACL': 'public-read'}}
+    'secret': Variable.get('AWS_SECRET_ACCESS_KEY')}
 
 dbt_vars = {
     'DBT_USER': Variable.get('DBT_USER'),
