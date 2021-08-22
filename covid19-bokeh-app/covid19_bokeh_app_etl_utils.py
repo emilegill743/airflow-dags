@@ -1,5 +1,5 @@
 import pandas as pd
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, Table, MetaData
 import os
 import time
 import functools
@@ -60,10 +60,15 @@ def jhu_cases_etl(connection_uri):
 
         """Load JHU data into Postgres Database"""
 
+        table_name = 'jhu_global_cases'
+
         db_engine = create_engine(connection_uri)
+        
+        metadata = MetaData()
+        Table(table_name, metadata).drop(db_engine, checkfirst=True)
 
         jhu_df.to_sql(
-            name="jhu_global_cases",
+            name=table_name,
             con=db_engine,
             schema="raw",
             if_exists="replace",
@@ -123,10 +128,15 @@ def jhu_deaths_etl(connection_uri):
 
         """Load JHU data into Postgres Database"""
 
+        table_name = 'jhu_global_deaths'
+
         db_engine = create_engine(connection_uri)
 
+        metadata = MetaData()
+        Table(table_name, metadata).drop(db_engine, checkfirst=True)
+
         jhu_df.to_sql(
-                name="jhu_global_deaths",
+                name=table_name,
                 con=db_engine,
                 schema="raw",
                 if_exists="replace",
@@ -163,10 +173,15 @@ def jhu_lookup_etl(connection_uri):
         columns={col: col.lower() for col in lookup_df.columns},
         inplace=True)
 
+    table_name = 'jhu_lookup'
+
     db_engine = create_engine(connection_uri)
 
+    metadata = MetaData() 
+    Table(table_name, metadata).drop(db_engine, checkfirst=True)
+
     lookup_df.to_sql(
-        name="jhu_lookup",
+        name=table_name,
         con=db_engine,
         schema="raw",
         if_exists="replace",
@@ -222,10 +237,15 @@ def jhu_us_cases_etl(connection_uri):
 
         """Load JHU data into Postgres Database"""
 
+        table_name = 'jhu_us_cases'
+
         db_engine = create_engine(connection_uri)
 
+        metadata = MetaData() 
+        Table(table_name, metadata).drop(db_engine, checkfirst=True)
+
         jhu_df.to_sql(
-            name="jhu_us_cases",
+            name=table_name,
             con=db_engine,
             schema="raw",
             if_exists="replace",
@@ -286,10 +306,15 @@ def jhu_us_deaths_etl(connection_uri):
 
         """Load JHU data into Postgres Database"""
 
+        table_name = 'jhu_us_deaths'
+
         db_engine = create_engine(connection_uri)
 
+        metadata = MetaData() 
+        Table(table_name, metadata).drop(db_engine, checkfirst=True)
+
         jhu_df.to_sql(
-            name="jhu_us_deaths",
+            name=table_name,
             con=db_engine,
             schema="raw",
             if_exists="replace",
@@ -313,10 +338,15 @@ def us_states_etl(connection_uri):
 
     us_states_df = pd.read_csv(us_states_dataset_path)
 
+    table_name = 'us_states_coords'
+
     db_engine = create_engine(connection_uri)
 
+    metadata = MetaData() 
+    Table(table_name, metadata).drop(db_engine, checkfirst=True)
+
     us_states_df.to_sql(
-                name="us_states_coords",
+                name=table_name,
                 con=db_engine,
                 schema="raw",
                 if_exists="replace",
@@ -391,10 +421,15 @@ def local_uk_data_etl(connection_uri):
 
         """Load UK local data into Postgres Database"""
 
+        table_name = 'local_uk'
+
         db_engine = create_engine(connection_uri)
 
+        metadata = MetaData() 
+        Table(table_name, metadata).drop(db_engine, checkfirst=True)
+
         local_uk_df.to_sql(
-            name="local_uk",
+            name=table_name,
             con=db_engine,
             schema="raw",
             if_exists="replace",
@@ -417,10 +452,15 @@ def owid_global_vaccinations_etl(connection_uri):
 
     # Load owid vaccinations data
 
+    table_name = 'owid_global_vaccinations'
+
     db_engine = create_engine(connection_uri)
+    metadata = MetaData()
+
+    Table(table_name, metadata).drop(db_engine, checkfirst=True)
 
     owid_global_vaccinations_df.to_sql(
-        name="owid_global_vaccinations",
+        name=table_name,
         con=db_engine,
         schema="raw",
         if_exists="replace",
@@ -437,15 +477,21 @@ def bloomberg_global_vaccinations_etl(connection_uri):
 
     # Load owid vaccinations data
 
+    table_name = 'bloomberg_global_vaccinations'
+
     db_engine = create_engine(connection_uri)
+    metadata = MetaData()
+
+    Table(table_name, metadata).drop(db_engine, checkfirst=True)
 
     bloomberg_global_vaccinations_df.to_sql(
-        name="bloomberg_global_vaccinations",
+        name=table_name,
         con=db_engine,
         schema="raw",
         if_exists="replace",
         index=False,
         method='multi')
+
 
 def load_to_s3(table_name, connection_uri, s3_storage_options):
 
