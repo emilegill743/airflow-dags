@@ -1,5 +1,5 @@
 import pandas as pd
-from sqlalchemy import create_engine, Table, MetaData
+from sqlalchemy import create_engine
 import os
 import time
 import functools
@@ -63,9 +63,9 @@ def jhu_cases_etl(connection_uri):
         table_name = 'jhu_global_cases'
 
         db_engine = create_engine(connection_uri)
-        
-        metadata = MetaData()
-        Table(table_name, metadata).drop(db_engine, checkfirst=True)
+
+        with db_engine.connect() as con:
+            con.execute(f'DROP TABLE IF EXISTS {table_name} CASCADE')
 
         jhu_df.to_sql(
             name=table_name,
@@ -132,8 +132,8 @@ def jhu_deaths_etl(connection_uri):
 
         db_engine = create_engine(connection_uri)
 
-        metadata = MetaData()
-        Table(table_name, metadata).drop(db_engine, checkfirst=True)
+        with db_engine.connect() as con:
+            con.execute(f'DROP TABLE IF EXISTS {table_name} CASCADE')
 
         jhu_df.to_sql(
                 name=table_name,
@@ -177,8 +177,8 @@ def jhu_lookup_etl(connection_uri):
 
     db_engine = create_engine(connection_uri)
 
-    metadata = MetaData() 
-    Table(table_name, metadata).drop(db_engine, checkfirst=True)
+    with db_engine.connect() as con:
+        con.execute(f'DROP TABLE IF EXISTS {table_name} CASCADE')
 
     lookup_df.to_sql(
         name=table_name,
@@ -241,8 +241,8 @@ def jhu_us_cases_etl(connection_uri):
 
         db_engine = create_engine(connection_uri)
 
-        metadata = MetaData() 
-        Table(table_name, metadata).drop(db_engine, checkfirst=True)
+        with db_engine.connect() as con:
+            con.execute(f'DROP TABLE IF EXISTS {table_name} CASCADE')
 
         jhu_df.to_sql(
             name=table_name,
@@ -310,8 +310,8 @@ def jhu_us_deaths_etl(connection_uri):
 
         db_engine = create_engine(connection_uri)
 
-        metadata = MetaData() 
-        Table(table_name, metadata).drop(db_engine, checkfirst=True)
+        with db_engine.connect() as con:
+            con.execute(f'DROP TABLE IF EXISTS {table_name} CASCADE')
 
         jhu_df.to_sql(
             name=table_name,
@@ -342,8 +342,8 @@ def us_states_etl(connection_uri):
 
     db_engine = create_engine(connection_uri)
 
-    metadata = MetaData() 
-    Table(table_name, metadata).drop(db_engine, checkfirst=True)
+    with db_engine.connect() as con:
+        con.execute(f'DROP TABLE IF EXISTS {table_name} CASCADE')
 
     us_states_df.to_sql(
                 name=table_name,
@@ -425,8 +425,8 @@ def local_uk_data_etl(connection_uri):
 
         db_engine = create_engine(connection_uri)
 
-        metadata = MetaData() 
-        Table(table_name, metadata).drop(db_engine, checkfirst=True)
+        with db_engine.connect() as con:
+            con.execute(f'DROP TABLE IF EXISTS {table_name} CASCADE')
 
         local_uk_df.to_sql(
             name=table_name,
@@ -455,9 +455,9 @@ def owid_global_vaccinations_etl(connection_uri):
     table_name = 'owid_global_vaccinations'
 
     db_engine = create_engine(connection_uri)
-    metadata = MetaData()
 
-    Table(table_name, metadata).drop(db_engine, checkfirst=True)
+    with db_engine.connect() as con:
+        con.execute(f'DROP TABLE IF EXISTS {table_name} CASCADE')
 
     owid_global_vaccinations_df.to_sql(
         name=table_name,
@@ -480,9 +480,9 @@ def bloomberg_global_vaccinations_etl(connection_uri):
     table_name = 'bloomberg_global_vaccinations'
 
     db_engine = create_engine(connection_uri)
-    metadata = MetaData()
 
-    Table(table_name, metadata).drop(db_engine, checkfirst=True)
+    with db_engine.connect() as con:
+        con.execute(f'DROP TABLE IF EXISTS {table_name} CASCADE')
 
     bloomberg_global_vaccinations_df.to_sql(
         name=table_name,
